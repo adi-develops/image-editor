@@ -35,6 +35,11 @@ def processImage(filename, operation):
             newFileName = f"static/{filename.split('.')[0]}.png"
             cv2.imwrite(newFileName, img)
             return newFileName
+        case "flip":
+            flippedImage = cv2.flip(img, -1)
+            newFileName = f"static/{filename}"
+            cv2.imwrite(newFileName, flippedImage)
+            return newFileName
 
 
 @app.route("/")
