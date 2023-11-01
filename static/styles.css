@@ -1,0 +1,8 @@
+.edited-image {
+    padding: 5%;
+}
+
+.alert {
+    display: flex;
+    justify-content: space-evenly;
+}
