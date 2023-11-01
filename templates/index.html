@@ -58,6 +58,10 @@
         <select name="filterType" class="form-select" id="filterSelect" aria-label="Filter type select">
           <option selected>Choose Filter type</option>
           <option value="cgray">Convert to GrayScale</option>
+          <option value="blur">Water Colour Blur</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
         </select>
       </div>
 
@@ -71,12 +75,26 @@
       </div>
 
       <div id="transformOptions" style="margin-top: 10px; display: none;">
-        <select name="transformType" class="form-select" id="transformSelect" aria-label="Transform type select" onchange="handleTransformOperation()">
+        <select name="transformType" class="form-select" id="transformSelect" aria-label="Transform type select"
+          onchange="handleTransformOperation()">
           <option selected>Choose Transformations</option>
-          <option value="crop">Cropping</option>
+          <option value="resize">Resize</option>
           <option value="rotate">Rotation</option>
           <option value="flip">Flip Image</option>
         </select>
+      </div>
+
+      <div id="angleInput" style="margin-top: 10px; display: none;">
+        <label for="rotateAngle">Rotation Angle:</label>
+        <input type="number" name="rotateAngle" id="rotateAngle" class="form-control"
+          placeholder="Enter rotation angle (in degrees)">
+      </div>
+
+      <div id="resizeInput" style="margin-top: 10px; display: none;">
+        <label for="height">Height Scale:</label>
+        <input type="text" name="scale_height" id="height" class="form-control" placeholder="Enter Height">
+        <label for="width">Width Scale:</label>
+        <input type="text" name="scale_width" id="width" class="form-control" placeholder="Enter Width">
       </div>
 
       <div id="flipOptions" style="margin-top: 10px; display: none;">
@@ -92,70 +110,103 @@
   </div>
 
   {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 30px;">
-      <div>
-        <strong>Success!</strong> Image has been processed
-        <img class='edited-image' src="static/{{ message | safe }}"></img>
-      </div>
-      <div>
-        <a href="{{ url_for('download_file', filename=message) }}"><button data-bs-dismiss="alert" type="button" class="download-button btn btn-success">Download</button></a>
-      </div>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  message in messages %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 30px;">
+    <div>
+      <strong>Success!</strong> Image has been processed
+      <img class='edited-image' src="static/{{ message | safe }}"></img>
     </div>
-    {% endfor %} {% endif %} {% endwith %}
+    <div>
+      <a href="{{ url_for('download_file', filename=message) }}"><button data-bs-dismiss="alert" type="button"
+          class="download-button btn btn-success">Download</button></a>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
 
-    <script>
-      function handleOperationChange() {
-        let operationSelect = document.getElementById("floatingSelect");
-        let conversionOptionsDiv = document.getElementById("convertOptions");
-        let filterOptionsDiv = document.getElementById("filterOptions");
-        let transformOptionsDiv = document.getElementById("transformOptions");
-        let flipOptionsDiv = document.getElementById("flipOptions");
+  <script>
+    function handleOperationChange() {
+      let operationSelect = document.getElementById("floatingSelect");
+      let conversionOptionsDiv = document.getElementById("convertOptions");
+      let filterOptionsDiv = document.getElementById("filterOptions");
+      let transformOptionsDiv = document.getElementById("transformOptions");
+      let flipOptionsDiv = document.getElementById("flipOptions");
+      let angleInputDiv = document.getElementById("angleInput");
+      let resizeInputDiv = document.getElementById("resizeInput");
 
-        if (operationSelect.value === "flip") {
-          flipOptionsDiv.style.display = "block";
-          conversionOptionsDiv.style.display = "none";
-          filterOptionsDiv.style.display = "none";
-          transformOptionsDiv.style.display = "none";
-        }
-        else if (operationSelect.value === "convert") {
-          conversionOptionsDiv.style.display = "block";
-          flipOptionsDiv.style.display = "none";
-          filterOptionsDiv.style.display = "none";
-          transformOptionsDiv.style.display = "none";
-        }
-        else if (operationSelect.value === "filter") {
-          filterOptionsDiv.style.display = "block";
-          flipOptionsDiv.style.display = "none";
-          conversionOptionsDiv.style.display = "none";
-          transformOptionsDiv.style.display = "none";
-        }
-        else if (operationSelect.value === "transform") {
-          transformOptionsDiv.style.display = "block";
-          filterOptionsDiv.style.display = "none";
-          flipOptionsDiv.style.display = "none";
-          conversionOptionsDiv.style.display = "none";
-        }
-        else {
-          conversionOptionsDiv.style.display = "none";
-          filterOptionsDiv.style.display = "none";
-          transformOptionsDiv.style.display = "none";
-          flipOptionsDiv.style.display = "none";
-        }
+      if (operationSelect.value === "flip") {
+        flipOptionsDiv.style.display = "block";
+        conversionOptionsDiv.style.display = "none";
+        filterOptionsDiv.style.display = "none";
+        transformOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else if (operationSelect.value === "convert") {
+        conversionOptionsDiv.style.display = "block";
+        flipOptionsDiv.style.display = "none";
+        filterOptionsDiv.style.display = "none";
+        transformOptionsDiv.style.display = "none";
+
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else if (operationSelect.value === "filter") {
+        filterOptionsDiv.style.display = "block";
+        flipOptionsDiv.style.display = "none";
+        conversionOptionsDiv.style.display = "none";
+        transformOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else if (operationSelect.value === "transform") {
+        transformOptionsDiv.style.display = "block";
+        angleInputDiv.style.display = "none";
+        filterOptionsDiv.style.display = "none";
+        flipOptionsDiv.style.display = "none";
+        conversionOptionsDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else {
+        conversionOptionsDiv.style.display = "none";
+        filterOptionsDiv.style.display = "none";
+        transformOptionsDiv.style.display = "none";
+        flipOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+    }
+
+    function handleTransformOperation() {
+      let transformOptionsDiv = document.getElementById("transformSelect");
+      let flipOptionsDiv = document.getElementById("flipOptions");
+      let angleInputDiv = document.getElementById("angleInput");
+      let resizeInputDiv = document.getElementById("resizeInput");
+
+
+      if (transformOptionsDiv.value === "flip") {
+        flipOptionsDiv.style.display = "block";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else if (transformOptionsDiv.value === "rotate") {
+        angleInputDiv.style.display = "block";
+        flipOptionsDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+      }
+      else if (transformOptionsDiv.value === "resize") {
+        resizeInputDiv.style.display = "block";
+        flipOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+      }
+      else {
+        flipOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
       }
 
-      function handleTransformOperation() {
-        let transformOptionsDiv = document.getElementById("transformSelect");
-        let flipOptionsDiv = document.getElementById("flipOptions");
-        
-        if (transformOptionsDiv.value === "flip") {
-          flipOptionsDiv.style.display = "block";
-        } else {
-          flipOptionsDiv.style.display = "none";
-        }
-      }
-    </script>
+    }
+  </script>
 
 </body>
 

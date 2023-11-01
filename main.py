@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, flash, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import cv2
+import numpy as np
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg', 'gif'}
@@ -25,27 +26,67 @@ def processImage(filename, operation):
                     match operation["flipType"]:
                         case "vertical-flip":
                             flippedImage = cv2.flip(img, 0)
-                            newFileName = filename
-                            cv2.imwrite(f"static/{newFileName}", flippedImage)
+                            cv2.imwrite(f"static/{filename}", flippedImage)
                             return newFileName
                         case "horizontal-flip":
-                            print("Horizontal Flip invoked")
                             flippedImage = cv2.flip(img, 1)
-                            newFileName = filename
-                            cv2.imwrite(f"static/{newFileName}", flippedImage)
+                            cv2.imwrite(f"static/{filename}", flippedImage)
                             return newFileName
                         case "both-flip":
                             flippedImage = cv2.flip(img, -1)
-                            newFileName = filename
-                            cv2.imwrite(f"static/{newFileName}", flippedImage)
+                            cv2.imwrite(f"static/{filename}", flippedImage)
                             return newFileName
+                        
+                case "rotate":
+                    angle = int(operation["rotateAngle"])
+                    (height, width) = img.shape[:2]
+                    rotPoint = (width//2, height//2)
+                    rotMat = cv2.getRotationMatrix2D(rotPoint, angle, 1.0)
+                    dimensions = (width, height)
+                    rotatedImage = cv2.warpAffine(img, rotMat, dimensions)
+                    cv2.imwrite(f"static/{filename}", rotatedImage)
+                    return filename
+                
+                case "resize":
+                    new_width = int(img.shape[1] * float(operation["scale_width"]))
+                    new_height = int(img.shape[0] * float(operation["scale_height"]))
+                    upscaled_image = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+                    cv2.imwrite(f"static/{filename}", upscaled_image)
+                    return filename
+
         case "filter":
             match operation["filterType"]:
                 case "cgray":
                     imageProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                    newFileName = filename
-                    cv2.imwrite(f"static/{newFileName}", imageProcessed)
+                    cv2.imwrite(f"static/{filename}", imageProcessed)
                     return newFileName
+                case "blur":
+                    kernel_size = 7
+                    b, g, r = cv2.split(img)
+                    b = cv2.medianBlur(b, kernel_size)
+                    g = cv2.medianBlur(g, kernel_size)
+                    r = cv2.medianBlur(r, kernel_size)
+                    watercolor = cv2.merge((b, g, r))
+                    cv2.imwrite(f"static/{filename}", watercolor)
+                    return filename
+                case "red":
+                    b, g, r = cv2.split(img)
+                    blank = np.zeros_like(b)
+                    red_channel = cv2.merge([blank, blank, r])
+                    cv2.imwrite(f"static/{filename}", red_channel)
+                    return filename
+                case "blue":
+                    b, g, r = cv2.split(img)
+                    blank = np.zeros_like(b)
+                    blue_channel = cv2.merge([b, blank, blank])
+                    cv2.imwrite(f"static/{filename}", blue_channel)
+                    return filename
+                case "green":
+                    b, g, r = cv2.split(img)
+                    blank = np.zeros_like(b)
+                    green_channel = cv2.merge([blank, g, blank])
+                    cv2.imwrite(f"static/{filename}", green_channel)
+                    return filename
         
         case "convert":
             match operation["convertType"]:
