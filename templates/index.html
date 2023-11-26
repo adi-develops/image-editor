@@ -24,10 +24,10 @@
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">How to Use</a>
+            <a class="nav-link" href="{{ url_for('instructions') }}" target="_blank">How to Use</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#"> About </a>
+            <a class="nav-link" href="{{ url_for('about') }}" target="_blank"> About </a>
           </li>
         </ul>
       </div>
@@ -49,6 +49,7 @@
           <option selected>Choose an editing Operation</option>
           <option id="filters" value="filter">Filters</option>
           <option id="convert" value="convert">Conversions</option>
+          <option id="recognize" value="recognize">Face Recognition</option>
           <option id="transform" value="transform">Transformations</option>
         </select>
         <label for="floatingSelect">Select an editing operation</label>
@@ -74,6 +75,7 @@
         </select>
       </div>
 
+
       <div id="transformOptions" style="margin-top: 10px; display: none;">
         <select name="transformType" class="form-select" id="transformSelect" aria-label="Transform type select"
           onchange="handleTransformOperation()">
@@ -81,6 +83,7 @@
           <option value="resize">Resize</option>
           <option value="rotate">Rotation</option>
           <option value="flip">Flip Image</option>
+          <option value="compress">Compression</option>
         </select>
       </div>
 
@@ -95,6 +98,12 @@
         <input type="text" name="scale_height" id="height" class="form-control" placeholder="Enter Height">
         <label for="width">Width Scale:</label>
         <input type="text" name="scale_width" id="width" class="form-control" placeholder="Enter Width">
+      </div>
+
+      <div id="compress" style="margin-top: 10px; display: none;">
+        <label for="quality" class="form-label">Image Quality:</label>
+        <input type="range" min="1" max="100" oninput="this.nextElementSibling.value = this.value" name="imageQuality" id="quality" class="form-range" placeholder="Image quality">
+        <output></output>
       </div>
 
       <div id="flipOptions" style="margin-top: 10px; display: none;">
@@ -118,7 +127,7 @@
     </div>
     <div>
       <a href="{{ url_for('download_file', filename=message) }}"><button data-bs-dismiss="alert" type="button"
-          class="download-button btn btn-success">Download</button></a>
+        class="download-button btn btn-success">Download</button></a>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
@@ -133,6 +142,8 @@
       let flipOptionsDiv = document.getElementById("flipOptions");
       let angleInputDiv = document.getElementById("angleInput");
       let resizeInputDiv = document.getElementById("resizeInput");
+      let compressDiv = document.getElementById("compress");
+      let facerecogOptionsDiv = document.getElementById("facerecogOptions");
 
       if (operationSelect.value === "flip") {
         flipOptionsDiv.style.display = "block";
@@ -141,6 +152,7 @@
         transformOptionsDiv.style.display = "none";
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
       else if (operationSelect.value === "convert") {
         conversionOptionsDiv.style.display = "block";
@@ -150,6 +162,8 @@
 
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
+
       }
       else if (operationSelect.value === "filter") {
         filterOptionsDiv.style.display = "block";
@@ -158,6 +172,7 @@
         transformOptionsDiv.style.display = "none";
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
       else if (operationSelect.value === "transform") {
         transformOptionsDiv.style.display = "block";
@@ -166,6 +181,7 @@
         flipOptionsDiv.style.display = "none";
         conversionOptionsDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
       else {
         conversionOptionsDiv.style.display = "none";
@@ -174,6 +190,7 @@
         flipOptionsDiv.style.display = "none";
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
     }
 
@@ -182,27 +199,39 @@
       let flipOptionsDiv = document.getElementById("flipOptions");
       let angleInputDiv = document.getElementById("angleInput");
       let resizeInputDiv = document.getElementById("resizeInput");
+      let compressDiv = document.getElementById("compress");
 
 
       if (transformOptionsDiv.value === "flip") {
         flipOptionsDiv.style.display = "block";
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
       else if (transformOptionsDiv.value === "rotate") {
         angleInputDiv.style.display = "block";
         flipOptionsDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
+
       }
       else if (transformOptionsDiv.value === "resize") {
         resizeInputDiv.style.display = "block";
         flipOptionsDiv.style.display = "none";
         angleInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
+      }
+      else if(transformOptionsDiv.value === "compress"){
+        flipOptionsDiv.style.display = "none";
+        angleInputDiv.style.display = "none";
+        resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "block";
       }
       else {
         flipOptionsDiv.style.display = "none";
         angleInputDiv.style.display = "none";
         resizeInputDiv.style.display = "none";
+        compressDiv.style.display = "none";
       }
 
     }
