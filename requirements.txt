@@ -5,7 +5,7 @@ chardet
 click
 cmake
 decorator
-./local_wheels/dlib-19.22.99-cp37-cp37m-win_amd64.whl
+dlib
 face-recognition
 face-recognition-models
 idna
@@ -19,3 +19,4 @@ requests
 tqdm
 urllib3
 wincertstore
+./local_wheels/dlib-19.22.99-cp37-cp37m-win_amd64.whl
