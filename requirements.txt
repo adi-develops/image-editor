@@ -5,7 +5,7 @@ chardet
 click
 cmake
 decorator
-dlib
+./local_wheels/dlib-19.22.99-cp37-cp37m-win_amd64.whl
 face-recognition
 face-recognition-models
 idna
